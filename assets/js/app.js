@@ -1,8 +1,8 @@
 const dashboardData = window.dashboardData;
 
 const BUILD = {
-  version: "v2026.09.25.04",
-  published: "25/09/2026 às 22:18 BRT"
+  version: "v2026.09.25.06",
+  published: "25/09/2026 às 22:24 BRT"
 };
 
 const ano = document.querySelector("#ano");
@@ -74,7 +74,7 @@ function renderSvgChart(id, series, labels, yTitle, options = {}) {
     const y2 = y(trendEnd);
 
     svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="chart-trend"/>`;
-    svg += `<text x="${Math.min(x2 - 8, width - pad.right - 6)}" y="${Math.max(y2 - 12, 24)}" text-anchor="end" class="chart-trend-label">Tendência linear ↑</text>`;
+    svg += `<text x="${Math.min(x2 - 8, width - pad.right - 6)}" y="${Math.max(y2 - 12, 24)}" text-anchor="end" class="chart-trend-label">Tendência de longo prazo ↑</text>`;
   }
 
   svg += `<text x="${pad.left}" y="20" class="chart-title">${esc(yTitle)}</text></svg>`;
@@ -87,7 +87,15 @@ renderSvgChart(
   [{ label: "ONI", data: dashboardData.ninoHistory.map(x => x.value) }],
   dashboardData.ninoHistory.map(x => x.label),
   "Anomalia de TSM (°C)",
-  { trend: true }
+  {}
+);
+
+renderSvgChart(
+  "#globalOceanWarmingChart",
+  [{ label: "Oceano global", data: dashboardData.globalOceanSst.map(x => x.value) }],
+  dashboardData.globalOceanSst.map(x => x.label),
+  "Anomalia de TSM global (°C)",
+  { trend: true, trendLabel: "Tendência de longo prazo" }
 );
 
 renderSvgChart(
