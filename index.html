@@ -1,7 +1,43 @@
 <!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="Painel científico sobre El Niño, mudanças climáticas e impactos no Brasil, com foco no Tocantins."><title>El Niño | Dados e impactos no Brasil</title><link rel="stylesheet" href="assets/css/style.css"><script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script></head><body>
-<header class="site-header"><div class="header-inner"><a class="brand" href="#inicio"><span class="brand-mark">MC</span><span>Mudanças Climáticas</span></a><nav><a href="#dados">Dados</a><a href="#mecanismo">Mecanismo</a><a href="#brasil">Brasil</a><a href="#fontes">Fontes</a></nav></div></header>
+<header class="site-header"><div class="header-inner"><a class="brand" href="#inicio"><span class="brand-mark">MC</span><span>Mudanças Climáticas</span></a><nav><a href="#erich">Pesquisador</a><a href="#dados">Dados</a><a href="#mecanismo">Mecanismo</a><a href="#brasil">Brasil</a><a href="#fontes">Fontes</a></nav></div></header>
 <main id="inicio">
 <section class="hero"><span class="eyebrow">Ciência de dados · clima · El Niño</span><h1>Alô Mundo</h1><p class="hero-lead">Como uma anomalia no Oceano Pacífico pode reorganizar ventos, chuvas e riscos climáticos a milhares de quilômetros de distância?</p><a class="button" href="#dados">Explorar os dados ↓</a><p class="hero-note">Painel para apresentação em sala · atualização: <strong id="dataAtualizacao"></strong></p></section>
+<section class="profile-card card" id="erich">
+  <div class="profile-top">
+    <div class="profile-badge">EC</div>
+    <div>
+      <span class="eyebrow">01 · Pesquisador em foco</span>
+      <h2>Dr. Erich Collicchio</h2>
+      <p class="profile-role">Professor da UFT e integrante da coordenação do Programa de Pós-Graduação em Agroenergia Digital.</p>
+    </div>
+  </div>
+  <div class="profile-grid">
+    <div>
+      <h3>Formação</h3>
+      <ul>
+        <li>Engenharia Agronômica — UFG (1987)</li>
+        <li>Especialização em Engenharia da Irrigação — UFV (1992)</li>
+        <li>Mestrado em Ciências, Genética e Melhoramento de Plantas — UFLA (1995)</li>
+        <li>Doutorado em Ecologia Aplicada — ESALQ/USP (2009)</li>
+        <li>Pós-doutorado em Fitotecnia — UFV</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Linhas de atuação</h3>
+      <p>Culturas agroenergéticas, zoneamento agroclimático, estoque de carbono e mudanças ambientais. Na UFT, atua no curso de Engenharia Ambiental e no PPGAD e está ligado ao Laboratório de Agroenergia, Uso da Terra e Mudanças Ambientais (LAMAM/UFT).</p>
+      <p class="profile-links"><a href="https://lattes.cnpq.br/0722996667111812" target="_blank" rel="noopener">Currículo Lattes ↗</a><a href="https://orcid.org/0000-0003-3452-6249" target="_blank" rel="noopener">ORCID ↗</a></p>
+    </div>
+  </div>
+  <div class="research-highlight">
+    <span class="eyebrow">Pesquisa · Ilha do Bananal</span>
+    <h3>Clima, energia e carbono em uma floresta sazonalmente inundável</h3>
+    <p>Collicchio é coautor do trabalho <strong>“Medidas micrometeorológicas e de ciclo atmosférico de CH₄ e CO₂ em uma floresta de inundação na região da Ilha de Bananal, Tocantins”</strong>. O estudo reúne dados de torre micrometeorológica e observações realizadas entre 2004 e 2014 para investigar padrões microclimáticos, fluxos de energia, CH₄ e CO₂ e os efeitos da inundação sazonal.</p>
+    <p class="research-note">Um resultado destacado é que 2005 e 2010 foram anos mais quentes, pouco chuvosos e mais secos na série analisada. Isso cria uma ponte científica muito interessante para a apresentação: <strong>temperatura + água + atmosfera + carbono</strong>.</p>
+    <a class="button secondary" href="https://docs.uft.edu.br/share/proxy/alfresco-noauth/api/internal/shared/node/wq_PmWrOQ8eI1qWl5LBaZQ/content/Biodiversidade%20na%20Regi%C3%A3o%20da%20IIha%20do%20Bananal%20Cant%C3%A3o.pdf" target="_blank" rel="noopener">Ver trabalho sobre a Ilha do Bananal ↗</a>
+  </div>
+  <p class="source-line">Fontes: UFT — Coordenação e catálogo da Editora; trabalho acadêmico sobre a Ilha do Bananal/Cantão. Perfil atualizado conforme fontes institucionais consultadas em 25/09/2026.</p>
+</section>
+
 <section class="intro card" id="dados"><div><span class="eyebrow">01 · A pergunta</span><h2>O El Niño começa no mar — mas termina onde?</h2></div><p>El Niño é parte do ENSO e envolve mudanças acopladas entre oceano e atmosfera no Pacífico equatorial. Aqui separamos <strong>observação</strong>, <strong>mecanismo</strong> e <strong>impacto regional</strong>, evitando transformar correlação em causalidade.</p></section>
 <section class="card"><div class="card-head"><div><span class="eyebrow">02 · Oceano</span><h2>Onde o Pacífico está mais quente?</h2></div><span class="metric">°C</span></div><div class="chart-wrap"><canvas id="ninoChart"></canvas></div><p class="caption">Diagnóstico CPC/NOAA de 10/09/2026. As regiões Niño são áreas padronizadas de monitoramento; Niño 3.4 é uma das principais referências do ENSO.</p></section>
 <section class="card"><div class="card-head"><div><span class="eyebrow">03 · Previsão</span><h2>Como as probabilidades publicadas evoluíram?</h2></div><span class="metric">%</span></div><div class="chart-wrap"><canvas id="probChart"></canvas></div><p class="caption">Cada ponto é uma previsão publicada em uma data e para uma janela futura diferente. Portanto, não é uma série temporal da intensidade do fenômeno.</p></section>
