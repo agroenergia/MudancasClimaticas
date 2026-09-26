@@ -1,13 +1,21 @@
-# Mudanças Climáticas — Painel El Niño
-Painel de apresentação científica sobre El Niño, oceano-atmosfera e impactos no Brasil, com foco no Tocantins.
+# Mudanças Climáticas — Seminário El Niño 2026
 
-## Fontes
-NOAA/CPC, INPE/CPTEC, INMET, CEMADEN/MCTI e SGB quando citado pelos boletins oficiais.
+Site de apresentação do seminário do **Programa de Pós-Graduação em Agroenergia Digital (PPGA/UFT)**.
 
-## Estrutura
-\`index.html\`, \`assets/css/style.css\`, \`assets/js/app.js\`, \`assets/js/data.js\`.
+## O que foi transformado
+- 17 slides do seminário convertidos em seções responsivas para navegador.
+- Modo apresentação com navegação por teclado.
+- Gráficos em SVG, sem dependência de biblioteca externa.
+- Dados separados em `assets/js/data.js`.
+- Estilos separados em `assets/css/style.css`.
+- Conteúdo e navegação em `index.html`.
 
-## Metodologia
-A página distingue observações de previsões. Todo indicador deve ser interpretado com data, período, unidade, região e fonte. Os mapas e esquemas desta versão são ilustrações didáticas próprias.
+## Navegação
+- **← / →**, PageUp/PageDown ou espaço para avançar/voltar.
+- **Modo apresentação** oculta a barra superior.
+- O site é publicado automaticamente pelo GitHub Pages a cada push na `main`.
 
-Última atualização demonstrativa: 25/09/2026.
+## Fontes principais
+NOAA/NCEI, NOAA PSL/CPC e INMET. Os valores observacionais e suas datas de referência aparecem no próprio site.
+
+Última publicação: 26/09/2026.
