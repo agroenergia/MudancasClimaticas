@@ -1,8 +1,8 @@
 const dashboardData = window.dashboardData;
 
 const BUILD = {
-  version: "v2026.09.25.02",
-  published: "25/09/2026 às 20:18 BRT"
+  version: "v2026.09.25.03",
+  published: "25/09/2026 às 22:11 BRT"
 };
 
 const ano = document.querySelector("#ano");
