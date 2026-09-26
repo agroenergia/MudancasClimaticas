@@ -1,2 +1,7 @@
-const ano = document.querySelector("#ano");
-if (ano) ano.textContent = new Date().getFullYear();
+import { dashboardData } from "./data.js";
+const ano=document.querySelector("#ano"); if(ano) ano.textContent=new Date().getFullYear();
+const stamp=document.querySelector("#dataAtualizacao"); if(stamp) stamp.textContent=dashboardData.updatedAt;
+function chart(id,type,data,labels,yTitle){const el=document.querySelector(id);if(!el||!window.Chart)return;new Chart(el,{type,data:{labels,datasets:[data]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,title:{display:true,text:yTitle}}}}})}
+chart("#ninoChart","bar",{label:"Anomalia TSM",data:dashboardData.nino.map(x=>x.value),borderWidth:1,borderRadius:7},dashboardData.nino.map(x=>x.label),"°C acima da média");
+chart("#probChart","line",{label:"Probabilidade",data:dashboardData.probability.map(x=>x.value),tension:.35,pointRadius:5,borderWidth:3},dashboardData.probability.map(x=>x.label),"%");
+const list=document.querySelector("#sourceList");if(list)list.innerHTML=dashboardData.sources.map(s=>`<tr><td><strong>${s.name}</strong><br><small>${s.type}</small></td><td>${s.date}</td><td>${s.note}</td><td><a href="${s.url}" target="_blank" rel="noopener">Fonte oficial ↗</a></td></tr>`).join("");
