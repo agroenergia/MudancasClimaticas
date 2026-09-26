@@ -1,5 +1,6 @@
 const D = window.dashboardData;
 const slides = [...document.querySelectorAll(".slide")];
+const manualSlide = document.querySelector(".manual-slide");
 const counter = document.querySelector("#counter");
 const progress = document.querySelector("#progressBar");
 let current = 0;
@@ -44,6 +45,8 @@ function go(i){
   progress.style.width=((current+1)/slides.length*100)+"%";
 }
 document.querySelector("#prevBtn").addEventListener("click",()=>go(current-1));
+const startBtn=document.querySelector("#startBtn");
+if(startBtn) startBtn.addEventListener("click",()=>go(1));
 document.querySelector("#nextBtn").addEventListener("click",()=>go(current+1));
 document.querySelector("#presentationBtn").addEventListener("click",()=>{
   document.body.classList.toggle("presentation");
