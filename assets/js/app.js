@@ -1,126 +1,67 @@
-const dashboardData = window.dashboardData;
+const D = window.dashboardData;
+const slides = [...document.querySelectorAll(".slide")];
+const counter = document.querySelector("#counter");
+const progress = document.querySelector("#progressBar");
+let current = 0;
 
-const BUILD = {
-  version: "v2026.09.25.06",
-  published: "25/09/2026 às 22:24 BRT"
-};
-
-const ano = document.querySelector("#ano");
-if (ano) ano.textContent = new Date().getFullYear();
-
-const stamp = document.querySelector("#dataAtualizacao");
-if (stamp) stamp.textContent = BUILD.published;
-
-function renderSvgChart(id, series, labels, yTitle, options = {}) {
-  const host = document.querySelector(id);
-  if (!host) return;
-
-  const width = 1100;
-  const height = 410;
-  const pad = { top: 34, right: 34, bottom: 58, left: 72 };
-  const plotW = width - pad.left - pad.right;
-  const plotH = height - pad.top - pad.bottom;
-  const values = series.flatMap(s => s.data);
-  const rawMin = Math.min(...values);
-  const rawMax = Math.max(...values);
-  const span = Math.max(rawMax - rawMin, 1);
-  const min = Math.floor((rawMin - span * 0.12) * 10) / 10;
-  const max = Math.ceil((rawMax + span * 0.12) * 10) / 10;
-  const x = i => pad.left + (labels.length === 1 ? plotW / 2 : (i / (labels.length - 1)) * plotW);
-  const y = v => pad.top + ((max - v) / (max - min)) * plotH;
-  const gridCount = 5;
-  const ticks = Array.from({ length: gridCount + 1 }, (_, i) => min + ((max - min) * i / gridCount));
-  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch]));
-
-  let svg = '<svg class="data-chart" viewBox="0 0 1100 410" preserveAspectRatio="none" aria-hidden="true">';
-  ticks.forEach(v => {
-    const yy = y(v);
-    svg += `<line x1="${pad.left}" x2="${width-pad.right}" y1="${yy}" y2="${yy}" class="chart-grid"/>`;
-    svg += `<text x="${pad.left-12}" y="${yy+5}" text-anchor="end" class="chart-axis">${v.toFixed(1)}</text>`;
-  });
-  if (min < 0 && max > 0) {
-    const yy = y(0);
-    svg += `<line x1="${pad.left}" x2="${width-pad.right}" y1="${yy}" y2="${yy}" class="chart-zero"/>`;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function chartLine(id,data,opts={}){
+  const el=document.querySelector(id); if(!el)return;
+  const w=1100,h=360,p={l:64,r:24,t:28,b:50},pw=w-p.l-p.r,ph=h-p.t-p.b;
+  const vals=data.map(d=>d[1]), min=opts.min??Math.min(...vals), max=opts.max??Math.max(...vals);
+  const span=Math.max(max-min,.5), lo=min-span*.12, hi=max+span*.12;
+  const x=i=>p.l+(data.length===1?pw/2:i/(data.length-1)*pw), y=v=>p.t+(hi-v)/(hi-lo)*ph;
+  const pts=data.map((d,i)=>x(i)+","+y(d[1])).join(" ");
+  let s='<svg class="svg-chart" viewBox="0 0 1100 360" role="img" aria-label="'+esc(opts.aria||"Gráfico")+'">';
+  for(let i=0;i<=5;i++){const v=lo+(hi-lo)*i/5,yy=y(v);s+='<line x1="'+p.l+'" x2="'+(w-p.r)+'" y1="'+yy+'" y2="'+yy+'" class="grid"/><text x="'+(p.l-10)+'" y="'+(yy+5)+'" text-anchor="end" class="axis">'+v.toFixed(opts.decimals??1)+'</text>';}
+  if(lo<0&&hi>0){const yy=y(0);s+='<line x1="'+p.l+'" x2="'+(w-p.r)+'" y1="'+yy+'" y2="'+yy+'" class="zero"/>';}
+  const step=Math.max(1,Math.ceil(data.length/8));
+  data.forEach((d,i)=>{if(i%step===0||i===data.length-1)s+='<text x="'+x(i)+'" y="'+(h-18)+'" text-anchor="middle" class="axis">'+esc(d[0])+'</text>';});
+  s+='<polyline points="'+pts+'" class="line"/>';
+  data.forEach((d,i)=>s+='<circle cx="'+x(i)+'" cy="'+y(d[1])+'" r="4.5" class="dot"><title>'+esc(d[0])+': '+d[1]+'</title></circle>');
+  if(opts.trend){
+    const n=vals.length,mx=(n-1)/2,my=vals.reduce((a,b)=>a+b,0)/n;
+    const slope=vals.reduce((a,v,i)=>a+(i-mx)*(v-my),0)/vals.reduce((a,_,i)=>a+(i-mx)**2,0);
+    const b=my-slope*mx, a0=b, a1=b+slope*(n-1);
+    s+='<line x1="'+x(0)+'" y1="'+y(a0)+'" x2="'+x(n-1)+'" y2="'+y(a1)+'" class="trend"/>';
+    s+='<text x="'+(w-p.r-4)+'" y="'+Math.max(24,y(a1)-10)+'" text-anchor="end" class="trend-label">Tendência de longo prazo ↑</text>';
   }
-
-  const labelStep = Math.max(1, Math.ceil(labels.length / 9));
-  labels.forEach((label, i) => {
-    if (i % labelStep === 0 || i === labels.length - 1) {
-      svg += `<text x="${x(i)}" y="${height-22}" text-anchor="middle" class="chart-axis">${esc(label)}</text>`;
-    }
-  });
-
-  series.forEach((s, si) => {
-    const points = s.data.map((v, i) => `${x(i)},${y(v)}`).join(" ");
-    svg += `<polyline points="${points}" class="chart-line chart-line-${si}"/>`;
-    s.data.forEach((v, i) => {
-      svg += `<circle cx="${x(i)}" cy="${y(v)}" r="5" class="chart-dot chart-dot-${si}"><title>${esc(labels[i])}: ${Number(v).toFixed(3)} ${esc(yTitle)}</title></circle>`;
-    });
-  });
-
-  if (options.trend) {
-    const data = series[0].data;
-    const n = data.length;
-    const meanX = (n - 1) / 2;
-    const meanY = data.reduce((sum, value) => sum + value, 0) / n;
-    const slope = data.reduce((sum, value, i) => sum + ((i - meanX) * (value - meanY)), 0) /
-      data.reduce((sum, _, i) => sum + Math.pow(i - meanX, 2), 0);
-    const intercept = meanY - slope * meanX;
-    const trendStart = intercept;
-    const trendEnd = intercept + slope * (n - 1);
-    const x1 = x(0);
-    const x2 = x(n - 1);
-    const y1 = y(trendStart);
-    const y2 = y(trendEnd);
-
-    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="chart-trend"/>`;
-    svg += `<text x="${Math.min(x2 - 8, width - pad.right - 6)}" y="${Math.max(y2 - 12, 24)}" text-anchor="end" class="chart-trend-label">Tendência de longo prazo ↑</text>`;
-  }
-
-  svg += `<text x="${pad.left}" y="20" class="chart-title">${esc(yTitle)}</text></svg>`;
-  host.innerHTML = svg;
-  host.classList.add("is-ready");
+  s+='</svg>'; el.innerHTML=s;
 }
-
-renderSvgChart(
-  "#ninoHistoryChart",
-  [{ label: "ONI", data: dashboardData.ninoHistory.map(x => x.value) }],
-  dashboardData.ninoHistory.map(x => x.label),
-  "Anomalia de TSM (°C)",
-  {}
-);
-
-renderSvgChart(
-  "#globalOceanWarmingChart",
-  [{ label: "Oceano global", data: dashboardData.globalOceanSst.map(x => x.value) }],
-  dashboardData.globalOceanSst.map(x => x.label),
-  "Anomalia de TSM global (°C)",
-  { trend: true, trendLabel: "Tendência de longo prazo" }
-);
-
-renderSvgChart(
-  "#probChart",
-  [{ label: "Probabilidade", data: dashboardData.probability.map(x => x.value) }],
-  dashboardData.probability.map(x => x.label),
-  "Probabilidade (%)"
-);
-
-const list = document.querySelector("#sourceList");
-if (list) {
-  list.innerHTML = dashboardData.sources.map(s =>
-    `<tr><td><strong>${s.name}</strong><br><small>${s.type}</small></td><td>${s.date}</td><td>${s.note}</td><td><a href="${s.url}" target="_blank" rel="noopener">Fonte oficial ↗</a></td></tr>`
-  ).join("");
+function chartBars(id,data,opts={}){
+  const el=document.querySelector(id); if(!el)return;
+  const w=1100,h=360,p={l:56,r:18,t:22,b:70},pw=w-p.l-p.r,ph=h-p.t-p.b,max=Math.max(...data.map(d=>d[1]))*1.12;
+  const gap=pw/data.length, bw=Math.max(14,gap*.64);
+  let s='<svg class="svg-chart" viewBox="0 0 1100 360" role="img" aria-label="'+esc(opts.aria||"Gráfico de barras")+'">';
+  for(let i=0;i<=4;i++){const v=max*i/4,yy=p.t+ph-(v/max)*ph;s+='<line x1="'+p.l+'" x2="'+(w-p.r)+'" y1="'+yy+'" y2="'+yy+'" class="grid"/><text x="'+(p.l-8)+'" y="'+(yy+5)+'" text-anchor="end" class="axis">'+v.toFixed(opts.decimals??0)+'</text>';}
+  data.forEach((d,i)=>{const bh=d[1]/max*ph,x=p.l+i*gap+(gap-bw)/2,y=p.t+ph-bh;s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+bh+'" class="bar"/><text x="'+(x+bw/2)+'" y="'+(y-7)+'" text-anchor="middle" class="value">'+d[1]+'</text><text x="'+(x+bw/2)+'" y="'+(h-18)+'" text-anchor="middle" class="axis">'+esc(d[0])+'</text>';});
+  s+='</svg>';el.innerHTML=s;
 }
-
-document.querySelectorAll(".definition-points > div").forEach(card => {
-  card.setAttribute("role", "button");
-  card.setAttribute("tabindex", "0");
-  const toggle = () => card.classList.toggle("is-expanded");
-  card.addEventListener("click", toggle);
-  card.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      toggle();
-    }
-  });
+function go(i){
+  current=Math.max(0,Math.min(slides.length-1,i));
+  slides[current].scrollIntoView({behavior:"smooth",block:"start"});
+  counter.textContent=(current+1)+" / "+slides.length;
+  progress.style.width=((current+1)/slides.length*100)+"%";
+}
+document.querySelector("#prevBtn").addEventListener("click",()=>go(current-1));
+document.querySelector("#nextBtn").addEventListener("click",()=>go(current+1));
+document.querySelector("#presentationBtn").addEventListener("click",()=>{
+  document.body.classList.toggle("presentation");
+  document.querySelector("#presentationBtn").textContent=document.body.classList.contains("presentation")?"Sair da apresentação":"Modo apresentação";
 });
+document.addEventListener("keydown",e=>{
+  if(["ArrowDown","PageDown"," "].includes(e.key)){e.preventDefault();go(current+1);}
+  if(["ArrowUp","PageUp"].includes(e.key)){e.preventDefault();go(current-1);}
+  if(e.key==="Home"){e.preventDefault();go(0);}
+  if(e.key==="End"){e.preventDefault();go(slides.length-1);}
+  if(e.key==="Escape")document.body.classList.remove("presentation");
+});
+const observer=new IntersectionObserver(entries=>entries.forEach(e=>{
+  if(e.isIntersecting){current=slides.indexOf(e.target);counter.textContent=(current+1)+" / "+slides.length;progress.style.width=((current+1)/slides.length*100)+"%";}
+}),{threshold:.55});
+slides.forEach(s=>observer.observe(s));
+chartLine("#globalTempChart",D.globalTemp,{trend:true,decimals:1,aria:"Temperatura média global, 1996 a 2025, com tendência de longo prazo"});
+chartBars("#rainChart",D.rain,{decimals:0,aria:"Acumulado de chuva por estação em agosto de 2026"});
+chartBars("#heatChart",D.heat,{decimals:1,aria:"Temperaturas máximas observadas em 10 de agosto de 2026"});
+chartLine("#ninoChart",D.nino34,{min:-.8,max:2.1,decimals:1,aria:"Anomalia Niño 3.4 de janeiro a agosto de 2026"});
+go(0);
