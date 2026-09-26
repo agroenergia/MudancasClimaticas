@@ -1,4 +1,4 @@
-import { dashboardData } from "./data.js";
+const dashboardData = window.dashboardData;
 
 const BUILD = {
   version: "v2026.09.25.02",
@@ -83,3 +83,16 @@ if (list) {
     `<tr><td><strong>${s.name}</strong><br><small>${s.type}</small></td><td>${s.date}</td><td>${s.note}</td><td><a href="${s.url}" target="_blank" rel="noopener">Fonte oficial ↗</a></td></tr>`
   ).join("");
 }
+
+document.querySelectorAll(".definition-points > div").forEach(card => {
+  card.setAttribute("role", "button");
+  card.setAttribute("tabindex", "0");
+  const toggle = () => card.classList.toggle("is-expanded");
+  card.addEventListener("click", toggle);
+  card.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      toggle();
+    }
+  });
+});
