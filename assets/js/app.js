@@ -1,8 +1,8 @@
 const dashboardData = window.dashboardData;
 
 const BUILD = {
-  version: "v2026.09.25.03",
-  published: "25/09/2026 às 22:11 BRT"
+  version: "v2026.09.25.04",
+  published: "25/09/2026 às 22:18 BRT"
 };
 
 const ano = document.querySelector("#ano");
@@ -11,7 +11,7 @@ if (ano) ano.textContent = new Date().getFullYear();
 const stamp = document.querySelector("#dataAtualizacao");
 if (stamp) stamp.textContent = BUILD.published;
 
-function renderSvgChart(id, series, labels, yTitle) {
+function renderSvgChart(id, series, labels, yTitle, options = {}) {
   const host = document.querySelector(id);
   if (!host) return;
 
@@ -58,6 +58,25 @@ function renderSvgChart(id, series, labels, yTitle) {
     });
   });
 
+  if (options.trend) {
+    const data = series[0].data;
+    const n = data.length;
+    const meanX = (n - 1) / 2;
+    const meanY = data.reduce((sum, value) => sum + value, 0) / n;
+    const slope = data.reduce((sum, value, i) => sum + ((i - meanX) * (value - meanY)), 0) /
+      data.reduce((sum, _, i) => sum + Math.pow(i - meanX, 2), 0);
+    const intercept = meanY - slope * meanX;
+    const trendStart = intercept;
+    const trendEnd = intercept + slope * (n - 1);
+    const x1 = x(0);
+    const x2 = x(n - 1);
+    const y1 = y(trendStart);
+    const y2 = y(trendEnd);
+
+    svg += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" class="chart-trend"/>`;
+    svg += `<text x="${Math.min(x2 - 8, width - pad.right - 6)}" y="${Math.max(y2 - 12, 24)}" text-anchor="end" class="chart-trend-label">Tendência linear ↑</text>`;
+  }
+
   svg += `<text x="${pad.left}" y="20" class="chart-title">${esc(yTitle)}</text></svg>`;
   host.innerHTML = svg;
   host.classList.add("is-ready");
@@ -67,7 +86,8 @@ renderSvgChart(
   "#ninoHistoryChart",
   [{ label: "ONI", data: dashboardData.ninoHistory.map(x => x.value) }],
   dashboardData.ninoHistory.map(x => x.label),
-  "Anomalia de TSM (°C)"
+  "Anomalia de TSM (°C)",
+  { trend: true }
 );
 
 renderSvgChart(
