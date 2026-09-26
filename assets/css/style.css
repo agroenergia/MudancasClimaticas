@@ -13,3 +13,9 @@
 .chart-dot{fill:#fff;stroke:#0b5a43;stroke-width:3;cursor:pointer;transition:r .15s ease}
 .chart-dot:hover{r:8}
 @media(max-width:850px){.build-stamp{display:none}}
+
+.definition-points>div{cursor:pointer;transform-origin:center;position:relative;z-index:1;transition:transform .24s ease,box-shadow .24s ease,filter .24s ease}
+.definition-points>div.is-expanded{transform:scale(1.075);z-index:5;box-shadow:0 24px 55px rgba(7,63,48,.28);filter:saturate(1.08)}
+.definition-points>div:focus-visible{outline:4px solid #15231e;outline-offset:4px}
+@media(max-width:700px){.definition-points>div.is-expanded{transform:scale(1.045)}}
+@media(max-width:380px){.definition-points>div.is-expanded{transform:scale(1.03)}}
